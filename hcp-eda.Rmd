@@ -1,0 +1,959 @@
+---
+title: '**Hollywood Closet Project:** *Exploratory Data Analysis*'
+author: "Samuel Campione"
+output:
+  html_document:
+    toc: yes
+    df_print: paged
+    code_folding: hide
+---
+
+<br>
+
+- What do the variables in this data set look like with descriptive statistics and data visualization?
+- Are people coming out at a younger age in more recent years?
+- Are less people closeted now? And are less people outed by someone else?
+- How has the age of coming out changed over time? 
+- How do all of these look across race, gender, and sexuality?
+
+------------------------------------------------------------------------
+
+## [1]{style="color: steelblue;"} Load the data set
+
+------------------------------------------------------------------------
+
+```{r include=FALSE}
+setwd( "/Users/sam/SamuelCampione/HCP")
+```
+
+```{r message=FALSE, warning=FALSE, class.source = "fold-show"}
+# Load required libraries
+library(tidyverse)
+library(wesanderson)
+library(forcats)
+library(knitr)
+library(kableExtra)
+library(ggrepel)
+library(patchwork)
+```
+
+<br>
+
+### [1.1]{style="color: lightgray;"} Read in the file
+
+```{r class.source = "fold-show"}
+data <- read.csv("HCP_data.csv", na.strings = c("","NA"))
+```
+
+<br>
+
+### [1.2]{style="color: lightgray;"} Preview the `data`
+
+```{r class.source = "fold-show", fig.align='center'}
+head(data)
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+## [1]{style="color: steelblue;"} Data Wrangling and Cleaning
+
+------------------------------------------------------------------------
+
+<br>
+
+### [2.1]{style="color: lightgrey;"} Relabel columns
+
+```{r class.source = "fold-show"}
+colnames(data) = c("id", "first_name", "last_name", "race", "birth_year", "age", 
+                  "coming_out_year", "medium", "initiation", "disclosure", "sexuality", 
+                  "closeted", "gender", "coming_out_nature_2", "sexuality_2")
+```
+
+<br>
+
+### [2.2]{style="color: lightgrey;"} Merge `first_name` and `last_name`
+
+```{r class.source = "fold-show"}
+data <- data %>%
+  unite("name", first_name:last_name, sep=" ")
+```
+
+<br>
+
+### [2.3]{style="color: lightgrey;"} Convert variables to correct data types
+
+```{r class.source = "fold-show"}
+# All character variables to factors
+data <- data %>%
+  mutate_if(sapply(data, is.character), as.factor)
+```
+
+<br>
+
+### [2.4]{style="color: lightgrey;"} Create variable `coming_out_2` to easily explore subset
+
+```{r class.source = "fold-show"}
+data<- data %>% 
+  mutate(coming_out_2 = ifelse(is.na(coming_out_nature_2), 0, 1) ,.after = gender)
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+## [3]{style="color: steelblue;"} Data Visualization and Summary
+
+------------------------------------------------------------------------
+
+<br>
+
+## [3.1]{style="color: lightgrey;"} Univariate Analysis 
+
+<br>
+
+### Categorical Variables
+
+------------------------------------------------------------------------
+
+## [3.1.1]{style="color: lightgrey;"} [Race]{style="color: steelblue;"}
+
+```{r echo=TRUE, warning=TRUE, fig.align='center'}
+pct_format <- scales::percent_format(accuracy = .1) #Used in the future bar plots
+
+data %>%
+  filter(race != "Unknown") %>%
+  ggplot(aes(x = fct_infreq(race), fill = fct_infreq(race))) +
+  geom_bar() +
+  guides(fill = "none") +
+  geom_text(
+    aes(label = sprintf(
+      "%d (%s)", ..count.., pct_format(..count.. / sum(..count..))
+    )),
+    stat = "count",
+    nudge_y = 5,
+    colour = "black",
+    size = 4,
+    fontface = "bold"
+  ) +
+  labs(title = "Figure 1.1", x = "", y = "Count") +
+  theme_classic() +
+  theme(plot.title = element_text(color = "black",
+                                  size = 14,
+                                  face = "bold")) +
+  theme(axis.text.x = element_text(size = 12, vjust = -1)) +
+  scale_fill_manual(values = wes_palette("Moonrise3", 5, type = "continuous"))
+```
+
+```{r, fig.align='center'}
+data %>%
+  filter(!is.na(race)) %>%
+  group_by(race) %>%
+  rename(Race = race) %>%
+  summarise(Frequency = n()) %>%
+  mutate("Relative Frequency" = round(Frequency / sum(Frequency), 3)) %>%
+  kable(caption = "TABLE 1.1: Race",
+        format = "html",
+        table.attr = "style='width:65%;'") %>%
+  kable_classic() %>%
+  kable_styling(bootstrap_options = c("striped"), font = 18) %>%
+  row_spec(0, bold = TRUE)
+```
+
+
+```{r}
+# Create function to calculate return # of NAs in a variable
+NA_calc <- function(x) {
+  a <- sum(is.na(x))
+  print(paste("Missing Values (NAs):" , a))
+}
+NA_calc(data$race)
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+## [3.1.2]{style="color: lightgrey;"} [Gender]{style="color: steelblue;"}
+
+```{r echo=TRUE, fig.align='center'}
+data %>%
+  filter(!is.na(gender)) %>%
+  ggplot(aes(x = fct_infreq(gender), fill = fct_infreq(gender))) +
+  geom_bar() +
+  guides(fill = "none") +
+  geom_text(
+    aes(label = sprintf(
+      "%d (%s)", ..count.., pct_format(..count.. / sum(..count..))
+    )),
+    stat = "count",
+    nudge_y = 5,
+    colour = "black",
+    size = 3.5,
+    fontface = "bold"
+  ) +
+  labs(title = "Figure 1.2", x = "", y = "Count") +
+  theme_classic() +
+  theme(plot.title = element_text(color = "black",
+                                  size = 14,
+                                  face = "bold")) +
+  theme(axis.text.x = element_text(
+    size = 11,
+    angle = 25,
+    hjust = 1
+  )) +
+  scale_fill_manual(values = wes_palette("Moonrise3", 10, type = "continuous"))
+```
+
+```{r fig.align='center'}
+data %>%
+  filter(!is.na(gender)) %>%
+  group_by(gender) %>%
+  rename(Gender = gender) %>%
+  summarise(Frequency = n()) %>%
+  mutate("Relative Frequency" = round(Frequency / sum(Frequency), 3)) %>%
+  kable(caption = "TABLE 1.2: Gender",
+        format = "html",
+        table.attr = "style='width:65%;'") %>%
+  kable_classic() %>%
+  kable_styling(bootstrap_options = c("striped"), font = 18) %>%
+  row_spec(0, bold = TRUE)
+```
+
+```{r fig.align='center'}
+NA_calc(data$gender)
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+## [3.1.3]{style="color: lightgrey;"} [Sexuality]{style="color: steelblue;"}
+
+```{r message=FALSE, warning=FALSE, fig.align='center'}
+#The value "Unspecified non heterosexual" fits poorly, so I have revalued it to "Non heterosexual".
+data %>%
+  filter(!is.na(sexuality)) %>%
+  mutate(sexuality = fct_recode(sexuality, "Non heterosexual" = "Unspecified non heterosexual")) %>%
+  ggplot(aes(x = fct_infreq(sexuality), fill = fct_infreq(sexuality))) +
+  geom_bar() +
+  guides(fill = "none") +
+  geom_text(
+    aes(label = sprintf(
+      "%d (%s)", ..count.., pct_format(..count.. / sum(..count..))
+    )),
+    stat = "count",
+    nudge_y = 5,
+    colour = "black",
+    size = 3.5,
+    fontface = "bold"
+  ) +
+  labs(title = "Figure 1.3", x = "", y = "Count") +
+  theme_classic() +
+  theme(plot.title = element_text(color = "black",
+                                  size = 14,
+                                  face = "bold")) +
+  theme(axis.text.x = element_text(
+    size = 12,
+    angle = 35,
+    hjust = 1.0
+  )) +
+  scale_fill_manual(values = wes_palette("Moonrise3", 9, type = "continuous"))
+```
+
+```{r fig.align='center'}
+data %>%
+  filter(!is.na(sexuality)) %>%
+  group_by(sexuality) %>%
+  mutate(sexuality = fct_recode(sexuality, "Non heterosexual" = "Unspecified non heterosexual")) %>%
+  rename(Sexuality = sexuality) %>%
+  summarise(Frequency = n()) %>%
+  mutate("Relative Frequency" = round(Frequency / sum(Frequency), 3)) %>%
+  kable(caption = "TABLE 1.3: Sexuality",
+        format = "html",
+        table.attr = "style='width:60%;'") %>%
+  kable_classic() %>%
+  kable_styling(bootstrap_options = c("striped"), font = 18) %>%
+  row_spec(0, bold = TRUE)
+```
+
+```{r fig.align='center'}
+NA_calc(data$sexuality)
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+## [3.1.2]{style="color: lightgrey;"} [In the closet?]{style="color: steelblue;"}
+
+```{r message=FALSE, warning=FALSE, fig.align='center'}
+data %>%
+  filter(!is.na(closeted)) %>%
+  ggplot(aes(x = closeted, fill = closeted)) +
+  geom_bar() +
+  guides(fill = "none") +
+  geom_text(
+    aes(label = sprintf(
+      "%d (%s)", ..count.., pct_format(..count.. / sum(..count..))
+    )),
+    stat = "count",
+    nudge_y = 5,
+    colour = "black",
+    size = 3.5,
+    fontface = "bold"
+  ) +
+  labs(title = "Figure 1.4", x = "", y = "Count") +
+  theme_classic() +
+  theme(plot.title = element_text(color = "black",
+                                  size = 14,
+                                  face = "bold")) +
+  theme(axis.text.x = element_text(size=12, angle = 35, hjust = 1)) +
+  scale_fill_manual(values = c("#85D4E3","LightBlue", "Linen", "#F4B5BD", "MistyRose"))
+```
+
+```{r fig.align='center'}
+data %>%
+  filter(!is.na(closeted)) %>%
+  group_by(closeted) %>%
+  rename("Closeted?" = closeted) %>%
+  summarise(Frequency = n()) %>%
+  mutate("Relative Frequency" = round(Frequency/sum(Frequency), 3)) %>%
+  kable(caption = "TABLE 1.4: Closeted before coming out", 
+        format = "html", 
+        table.attr = "style='width:65%;'") %>% 
+  kable_classic() %>%
+  kable_styling(bootstrap_options = c("striped"), font = 18) %>%
+  row_spec(0,bold=TRUE)
+```
+
+```{r fig.align='center'}
+NA_calc(data$closeted)
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+## [3.1.5]{style="color: lightgrey;"} [Coming Out Medium]{style="color: steelblue;"}
+
+```{r fig.align='center'}
+data %>%
+  filter(!is.na(medium)) %>%
+  ggplot(aes(x = fct_infreq(medium), fill = fct_infreq(medium))) +
+  geom_bar() +
+  guides(fill = "none") +
+  geom_text(
+    aes(label = sprintf(
+      "%d (%s)", ..count.., pct_format(..count.. / sum(..count..))
+    )),
+    stat = "count",
+    nudge_y = 5,
+    colour = "black",
+    size = 3.5,
+    fontface = "bold"
+  ) +
+  labs(title = "Figure 1.5", x = "", y = "Count") +
+  theme_classic() +
+  theme(plot.title = element_text(color = "black",
+                                  size = 14,
+                                  face = "bold")) +
+  theme(axis.text.x = element_text(size=11, angle=35, hjust = 1)) +
+  scale_fill_manual(values = wes_palette("Moonrise3", 6, type = "continuous"))
+```
+
+```{r fig.align='center'}
+data %>%
+  group_by(medium) %>%
+  filter(!is.na(medium)) %>%
+  rename(Medium = medium) %>%
+  summarise(Frequency = n()) %>%
+  mutate("Relative Frequency" = round(Frequency/sum(Frequency), 3)) %>%
+  kable(caption = "TABLE 1.5: Medium of coming out",
+        format = "html", 
+        table.attr = "style='width:65%;'") %>% 
+  kable_classic() %>%
+  kable_styling(bootstrap_options = c("striped"), font = 18) %>%
+  row_spec(0,bold=TRUE)
+```
+
+```{r fig.align='center'}
+NA_calc(data$medium)
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+## [3.1.6]{style="color: lightgrey;"} [Who Initiated Coming Out?]{style="color: steelblue;"}
+
+```{r fig.width= 4, fig.align='center'}
+data %>%
+  filter(!is.na(initiation)) %>%
+  ggplot(aes(x = fct_infreq(initiation), fill = fct_infreq(initiation))) +
+  geom_bar() +
+  guides(fill = "none") +
+  geom_text(
+    aes(label = sprintf(
+      "%d (%s)", ..count.., pct_format(..count.. / sum(..count..))
+    )),
+    stat = "count",
+    nudge_y = 5,
+    colour = "black",
+    size = 4,
+    fontface = "bold"
+  ) +
+  labs(title = "Figure 1.6: Initiation", x = "", y = "Count") +
+  theme_classic() +
+  theme(plot.title = element_text(color = "black",
+                                  size = 14,
+                                  face = "bold")) +
+  theme(axis.text.x = element_text(size=12)) +
+  scale_fill_manual(values = wes_palette("Moonrise3", 2, type = "continuous"))
+```
+
+```{r fig.align='center'}
+data %>%
+  group_by(initiation) %>%
+  filter(!is.na(initiation)) %>%
+  rename(Initiation = initiation) %>%
+  summarise(Frequency = n()) %>%
+  mutate("Relative Frequency" = round(Frequency/sum(Frequency), 3)) %>%
+  kable(caption = "TABLE 1.6: Who initiated coming out",
+        format = "html", table.attr = "style='width:65%;'") %>% 
+  kable_classic() %>%
+  kable_styling(bootstrap_options = c("striped"), font = 18) %>%
+  row_spec(0,bold=TRUE)
+```
+
+```{r fig.align='center'}
+NA_calc(data$initiation)
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+## [3.1.7]{style="color: lightgrey;"} [Who Disclosed?]{style="color: steelblue;"}
+
+```{r fig.width= 4, fig.align='center'}
+data %>%
+  filter(!is.na(disclosure)) %>%
+  ggplot(aes(x = fct_infreq(disclosure), fill = fct_infreq(disclosure))) +
+  geom_bar() +
+  guides(fill = "none") +
+  geom_text(
+    aes(label = sprintf(
+      "%d (%s)", ..count.., pct_format(..count.. / sum(..count..))
+    )),
+    stat = "count",
+    nudge_y = 5,
+    colour = "black",
+    size = 4,
+    fontface = "bold"
+  ) +
+  labs(title = "Figure 1.7: Disclosure", x = "", y = "Count") +
+  theme_classic() +
+  theme(plot.title = element_text(color = "black",
+                                  size = 14,
+                                  face = "bold")) +
+  theme(axis.text.x = element_text(size=12)) +
+  scale_fill_manual(values = wes_palette("Moonrise3", 2, type = "continuous"))
+```
+
+```{r fig.align='center'}
+data %>%
+  group_by(disclosure) %>%
+  filter(!is.na(disclosure)) %>%
+  rename(Disclosure = disclosure) %>%
+  summarise(Frequency = n()) %>%
+  mutate("Relative Frequency" = round(Frequency/sum(Frequency), 3)) %>%
+  kable(caption = "TABLE 1.7: Who disclosed", format = "html", table.attr = "style='width:65%;'") %>% 
+  kable_classic() %>%
+  kable_styling(bootstrap_options = c("striped"), font = 18) %>%
+  row_spec(0,bold=TRUE)
+```
+
+```{r fig.align='center'}
+NA_calc(data$disclosure)
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+## [3.1.8]{style="color: lightgrey;"} [Had Second Coming Out?]{style="color: steelblue;"}
+
+```{r fig.width= 4, fig.align='center'}
+data %>%
+  filter(!is.na(coming_out_2)) %>%
+  mutate(coming_out_2 = as.factor(coming_out_2)) %>%
+  mutate(coming_out_2 = if_else(coming_out_2 == "1", "Yes", "No")) %>%
+  ggplot(aes(x = fct_infreq(coming_out_2), fill = fct_infreq(coming_out_2))) +
+  geom_bar() +
+  guides(fill = "none") +
+  geom_text(
+    aes(label = sprintf(
+      "%d (%s)", ..count.., pct_format(..count.. / sum(..count..))
+    )),
+    stat = "count",
+    nudge_y = 5,
+    colour = "black",
+    size = 4.5,
+    fontface = "bold"
+  ) +
+  labs(title = "Figure 1.8", x = "", y = "Count") +
+  theme_classic() +
+  theme(plot.title = element_text(color = "black",
+                                  size = 14,
+                                  face = "bold")) +
+  theme(axis.text.x = element_text(size=12)) +
+  scale_fill_manual(values = wes_palette("Moonrise3", 2, type = "continuous"))
+```
+
+```{r fig.align='center'}
+data %>%
+  group_by(coming_out_2) %>%
+  filter(!is.na(coming_out_2)) %>%
+  mutate(coming_out_2 = as.factor(coming_out_2)) %>%
+  mutate(coming_out_2 = if_else(coming_out_2 == "1", "Yes", "No")) %>%
+  rename("Had 2nd Coming Out" = coming_out_2) %>%
+  summarise(Frequency = n()) %>%
+  mutate("Relative Frequency" = round(Frequency/sum(Frequency), 2)) %>%
+  kable(caption = "TABLE 1.8: Second coming out events", format = "html", table.attr = "style='width:65%;'") %>%
+  kable_classic() %>%
+  kable_styling(bootstrap_options = c("striped"), font = 18) %>%
+  row_spec(0,bold=TRUE)
+```
+
+```{r fig.align='center'}
+NA_calc(data$coming_out_2)
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+## [3.1.9]{style="color: lightgrey;"} [Second Coming Out Nature]{style="color: steelblue;"}
+
+```{r fig.width= 4, fig.align='center'}
+data %>%
+  filter(coming_out_2 == 1, 
+         !is.na(coming_out_nature_2)) %>%
+  ggplot(aes(x = fct_infreq(coming_out_nature_2), fill = fct_infreq(coming_out_nature_2))) +
+  geom_bar() +
+  guides(fill = "none") +
+  geom_text(
+    aes(label = sprintf(
+      "%d (%s)", ..count.., pct_format(..count.. / sum(..count..))
+    )),
+    stat = "count",
+    nudge_y = 1,
+    colour = "black",
+    size = 4.5,
+    fontface = "bold"
+  ) +
+  labs(title = "Figure 1.9", x = "", y = "Count") +
+  theme_classic() +
+  theme(plot.title = element_text(color = "black",
+                                  size = 14,
+                                  face = "bold")) +
+  theme(axis.text.x = element_text(size=12)) +
+  scale_fill_manual(values = wes_palette("Moonrise3", 2, type = "continuous"))
+```
+
+```{r fig.align='center'}
+data %>%
+  group_by(coming_out_nature_2) %>%
+  filter(coming_out_2 == 1,
+         !is.na(coming_out_nature_2)) %>%
+  rename("Nature" = coming_out_nature_2) %>%
+  summarise(Frequency = n()) %>%
+  mutate("Relative Frequency" = round(Frequency/sum(Frequency), 2)) %>%
+  kable(caption = "TABLE 1.9: Nature of second coming out", format = "html", table.attr = "style='width:65%;'") %>%
+  kable_classic() %>%
+  kable_styling(bootstrap_options = c("striped"), font = 18) %>%
+  row_spec(0,bold=TRUE)
+```
+
+```{r fig.align='center'}
+subset <- data %>%
+  filter(coming_out_2 == 1)
+NA_calc(subset$coming_out_nature_2)
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+## [3.1.10]{style="color: lightgrey;"} [Second Coming Out Sexuality]{style="color: steelblue;"}
+
+```{r fig.align='center'}
+data %>%
+  filter(coming_out_2 == 1, 
+         !is.na(sexuality_2)) %>%
+  mutate(sexuality_2 = fct_recode(sexuality_2,"Non heterosexual"= "Unspecified non heterosexual")) %>%
+  ggplot(aes(x = fct_infreq(sexuality_2), fill = fct_infreq(sexuality_2))) +
+  geom_bar() +
+  guides(fill = "none") +
+  geom_text(
+    aes(label = sprintf(
+      "%d (%s)", ..count.., pct_format(..count.. / sum(..count..))
+    )),
+    stat = "count",
+    nudge_y = .65,
+    colour = "black",
+    size = 3.45,
+    fontface = "bold"
+  ) +
+  labs(title = "Figure 1.10", x = "", y = "Count") +
+  theme_classic() +
+  theme(plot.title = element_text(color = "black",
+                                  size = 14,
+                                  face = "bold")) +
+  theme(axis.text.x = element_text(size=12, angle = 45, hjust = 1)) +
+  scale_fill_manual(values = wes_palette("Moonrise3", 10, type = "continuous"))
+```
+
+```{r fig.align='center'}
+data %>%
+  mutate(sexuality_2 = fct_recode(sexuality_2, "Non heterosexual"= "Unspecified non heterosexual",
+                                  "Unspecified" = "Unspecified ")) %>%
+  group_by(sexuality_2) %>%
+  filter(coming_out_2 == 1,
+         !is.na(sexuality_2)) %>%
+  rename("Sexuality" = sexuality_2) %>%
+  summarise(Frequency = n()) %>%
+  mutate("Relative Frequency" = round(Frequency/sum(Frequency), 2)) %>%
+  kable(caption = "TABLE 1.10: Sexuality at second coming out", format = "html", table.attr = "style='width:75%;'") %>%
+  kable_classic() %>%
+  kable_styling(bootstrap_options = c("striped"), font = 18) %>%
+  row_spec(0,bold=TRUE)
+```
+
+```{r fig.align='center'}
+NA_calc(subset$sexuality_2)
+```
+
+<br>
+
+
+## [3.2.1]{style="color: lightgrey;"} [Current Age]{style="color: steelblue;"}
+
+<br>
+
+### - Current ages in 2022 based on birth year. For simplicity, I applied a filter to include only those under 100 years old
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, fig.align='center'}
+p1 <- data %>%
+  filter(!is.na(birth_year)) %>%
+  mutate(current_age = 2022 - birth_year) %>%
+  filter(current_age < 100) %>%
+  ggplot(aes(x = current_age)) +
+  geom_histogram(
+    fill = "#85D4E3",
+    colour = 1,
+    binwidth = 5,
+    size = .25
+  ) +
+  guides(fill = "none", colour = "none") +
+  labs(title = "Figure 1.12",
+       x = "Age",
+       y = "Count") +
+  coord_cartesian(xlim = c(10, 100), ylim = c(0, 40)) +
+  theme_classic() +
+  theme(plot.title = element_text(color = "black",
+                                  size = 20,
+                                  face = "bold"))
+
+p2 <- data %>%
+  filter(!is.na(birth_year)) %>%
+  mutate(current_age = 2022 - birth_year) %>%
+  filter(current_age < 100) %>%
+  ggplot(aes(x = current_age, y = ..density..)) +
+  geom_density(lwd = .75, fill = "lightgray") +
+  guides(fill = "none", colour = "none") +
+  labs(x = "Age",
+       y = "Density") +
+  theme_classic() +
+  theme(plot.title = element_text(color = "black",
+                                  size = 20,
+                                  face = "bold")) +
+  xlim(0, 100) +
+  geom_vline(
+    aes(xintercept = median(current_age)),
+    color = "red",
+    size = 0.75,
+    linetype = "longdash"
+  ) +
+  geom_text(aes(
+    median(current_age),
+    y = 0.03,
+    label = paste("median =", median(current_age)),
+    hjust = -.3,
+  ),
+  size = 5.9,
+  face = "plain")
+
+p1 + p2
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, fig.height= 3, fig.align='center'}
+is.outlier <- function(x) {
+  return(x  < quantile(x, 0.25) - 1.5 * IQR(x) |
+           x > quantile(x, 0.75) + 1.5 * IQR(x))
+}
+
+data %>%
+  filter(!is.na(birth_year)) %>%
+  mutate(current_age = 2022 - birth_year) %>%
+  mutate(Outlier = ifelse(is.outlier(current_age), current_age, "")) %>%
+  ggplot(aes(x = current_age, y = "")) +
+  geom_boxplot(
+    fill = "lightgray",
+    outlier.shape = 5,
+    outlier.color = "red",
+    outlier.size = 4
+  ) +
+  labs(title = "Boxplot of Current Age",
+       x = "Age",
+       y = "") +
+  theme_classic() +
+  theme(axis.ticks.y = element_blank(),
+        axis.text.y  = element_blank()) +
+  theme(plot.title = element_text(size = 14,
+                                  face = "bold")) +
+  geom_text_repel(aes(label = ifelse(duplicated(Outlier), "", Outlier))) +
+  annotate("text", x = 41 + 5, y = 1.5, label = paste("median = 41"), fontface = 2)
+```
+
+```{r, fig.align='center'}
+data %>%
+  filter(!is.na(birth_year)) %>%
+  mutate(current_age = 2022 - birth_year) %>%
+  summarise(Mean =  round(mean(current_age),1),
+            SD =  round(sd(current_age),1),
+            Median = median(current_age),
+            Min = min(current_age),
+            Max = max(current_age),
+            NAs = sum(is.na(age))
+            ) %>%
+  kable(caption = "TABLE 1.12: Summary of Current Ages", format = "html", table.attr = "style='width:40%;'") %>% 
+  kable_classic() %>%
+  kable_styling(bootstrap_options = c("striped"), font = 20) %>%
+  row_spec(0,bold=TRUE)
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+## [3.2.2]{style="color: lightgrey;"} [Coming Out Year]{style="color: steelblue;"}
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, fig.align='center'}
+p1 <- data %>%
+  filter(!is.na(coming_out_year), 
+         coming_out_year > 1940) %>%
+  ggplot(aes(x = coming_out_year)) +
+  geom_histogram(
+    fill = "#85D4E3",
+    colour = 1,
+    binwidth = 2,
+    size = .25
+  ) +
+  guides(fill = "none", colour = "none") +
+  labs(title = "Figure 1.13",
+       x = "Year",
+       y = "Count") +
+  theme_classic() +
+  theme(plot.title = element_text(color = "black",
+                                  size = 20,
+                                  face = "bold"))
+
+p2 <- data %>%
+  filter(!is.na(coming_out_year),
+         coming_out_year > 1940) %>%
+  ggplot(aes(x = coming_out_year, y = ..density..)) +
+  geom_density(lwd = .75, fill = "lightgray") +
+  guides(fill = "none", colour = "none") +
+  labs(x = "Year",
+       y = "Density") +
+  theme_classic() +
+  theme(plot.title = element_text(color = "black",
+                                  size = 20,
+                                  face = "bold")) +
+  geom_vline(
+    aes(xintercept = median(coming_out_year)),
+    color = "red",
+    size = 0.75,
+    linetype = "longdash"
+  ) +
+  geom_text(aes(
+    median(coming_out_year),
+    y = 0.05,
+    label = paste("median =", median(coming_out_year)),
+    hjust = 1.2
+  ),
+  size = 5.9,
+  face = "plain")
+
+p1 + p2
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, fig.height= 3, fig.align='center'}
+is.outlier <- function(x) {
+  return(x  < quantile(x, 0.25) - 1.5 * IQR(x) |
+           x > quantile(x, 0.75) + 1.5 * IQR(x))
+}
+
+data %>%
+  filter(!is.na(coming_out_year)) %>%
+  mutate(Outlier = ifelse(is.outlier(coming_out_year), coming_out_year, "")) %>%
+  ggplot(aes(x = coming_out_year, y = "")) +
+  geom_boxplot(
+    fill = "lightgray",
+    outlier.shape = 5,
+    outlier.color = "red",
+    outlier.size = 4
+  ) +
+  labs(title = "Boxplot of Coming Out Year",
+       x = "Year",
+       y = "") +
+  theme_classic() +
+  theme(axis.ticks.y = element_blank(),
+        axis.text.y  = element_blank()) +
+  theme(plot.title = element_text(size = 14,
+                                  face = "bold")) +
+  geom_text_repel(aes(label = ifelse(duplicated(Outlier), "", Outlier))) +
+  annotate("text", x = median(data$coming_out_year, na.rm = T) -2, y = 1.5, label = paste("median = ", median(data$coming_out_year, na.rm = T)), fontface = 2)
+```
+
+```{r fig.align='center'}
+data %>%
+  filter(!is.na(coming_out_year)) %>%
+  summarise(Mean =  round(mean(coming_out_year)),
+            SD =  round(sd(coming_out_year)),
+            Median = median(coming_out_year),
+            Min = min(coming_out_year),
+            Max = max(coming_out_year),
+            NAs = sum(is.na(age))
+            ) %>%
+  kable(caption = "TABLE 1.13: Summary of Coming Out Years", format = "html", table.attr = "style='width:40%;'") %>% 
+  kable_classic() %>%
+  kable_styling(bootstrap_options = c("striped"), font = 20) %>%
+  row_spec(0,bold=TRUE)
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+## [3.2.3]{style="color: lightgrey;"} [Age at Coming Out]{style="color: steelblue;"}
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, fig.align='center'}
+p1 <- data %>% 
+  filter(!is.na(age)) %>%
+  ggplot(aes(x = age)) +
+  geom_histogram(
+    fill = "#85D4E3",
+    colour = 1,
+    binwidth = 2,
+    size = .25
+  ) +
+  guides(fill = "none", colour = "none") +
+  labs(title = "Figure 1.14",
+       x = "Age",
+       y = "Count") +
+  theme_classic() +
+  theme(plot.title = element_text(color = "black",
+                                  size = 20,
+                                  face = "bold"))
+
+p2 <- data %>%
+  filter(!is.na(age)) %>%
+  ggplot(aes(x = age, y = ..density..)) +
+  geom_density(lwd = .75, fill = "lightgray") +
+  guides(fill = "none", colour = "none") +
+  labs(x = "Age",
+       y = "Density") +
+  theme_classic() +
+  theme(plot.title = element_text(color = "black",
+                                  size = 20,
+                                  face = "bold")) +
+  geom_vline(
+    aes(xintercept = median(age)),
+    color = "red",
+    size = 0.75,
+    linetype = "longdash"
+  ) +
+  annotate("text",
+           x = median(data$age, na.rm = T),
+           y = 0.035,
+           label = paste("median =", median(data$age, na.rm = T)),
+           hjust = -.35,
+           fontface = 2,
+           size = 5.9)
+
+p1 + p2
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, fig.height= 3, fig.align='center'}
+is.outlier <- function(x) {
+  return(x  < quantile(x, 0.25) - 1.5 * IQR(x) |
+           x > quantile(x, 0.75) + 1.5 * IQR(x))
+}
+
+data %>%
+  filter(!is.na(age)) %>%
+  mutate(Outlier = ifelse(is.outlier(age), age, "")) %>%
+  ggplot(aes(x = age, y = "")) +
+  geom_boxplot(
+    fill = "lightgray",
+    outlier.shape = 5,
+    outlier.color = "red",
+    outlier.size = 4
+  ) +
+  labs(title = "Boxplot of Coming Out Age",
+       x = "Age",
+       y = "") +
+  theme_classic() +
+  theme(axis.ticks.y = element_blank(),
+        axis.text.y  = element_blank()) +
+  theme(plot.title = element_text(size = 14,
+                                  face = "bold")) +
+  geom_text_repel(aes(label = ifelse(duplicated(Outlier), "", Outlier))) +
+  annotate("text", x = median(data$age, na.rm = T) + 10, y = 1.5, label = paste("median = ", median(data$age, na.rm = T)), fontface = 2)
+```
+
+```{r fig.align='center'}
+data %>%
+  filter(!is.na(age)) %>%
+  summarise(Mean =  round(mean(age),1),
+            SD =  round(sd(age),1),
+            Median = median(age),
+            Min = min(age),
+            Max = max(age),
+            NAs = sum(is.na(age))
+            ) %>%
+  kable(caption = "TABLE 1.14: Summary of Coming Out Age", format = "html", table.attr = "style='width:40%;'") %>% 
+  kable_classic() %>%
+  kable_styling(bootstrap_options = c("striped"), font = 20) %>%
+  row_spec(0,bold=TRUE)
+```
+
+<br>
+
+------------------------------------------------------------------------
+
+## [3.2]{style="color: lightgrey;"} Multivariate Analysis
+
+<br>
+
+------------------------------------------------------------------------
+
+
+
+<br>
+
+<br>
