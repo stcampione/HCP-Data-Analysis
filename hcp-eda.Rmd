@@ -62,8 +62,8 @@ data <- read.csv("HCP_data.csv", na.strings = c("","NA"))
 
 ### [1.2]{style="color: lightgray;"} Preview the `data`
 
-```{r class.source = "fold-show", fig.align='center'}
-head(data)
+```{r fig.align='center'}
+glimpse(data)
 ```
 
 <br>

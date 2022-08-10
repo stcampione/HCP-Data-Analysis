@@ -80,44 +80,26 @@ data <- read.csv("HCP_data.csv", na.strings = c("","NA"))
 ### <span style="color: lightgray;">1.2</span> Preview the `data`
 
 ``` r
-head(data)
+glimpse(data)
 ```
 
-    ##   ID   First.Name      Last.Name Race.Ethnicity Birth.Year Coming.Out.Age
-    ## 1  1       Jackie         Abbott          White       1992             30
-    ## 2  2          Ali          Adler          White       1967             20
-    ## 3  3        James        Adomian          White       1980             30
-    ## 4  4      Roberto Aguirre Sacasa         Latinx       1973             31
-    ## 5  5        Clay           Aiken          White       1978             29
-    ## 6  6 Loretta Mary          Aiken          Black       1894             27
-    ##   Coming.Out.Year Coming.Out.Medium Type.of.Outing.Initiation
-    ## 1            2017      Social Media           Other initiated
-    ## 2            1987             Print            Self initiated
-    ## 3            2010            Online           Other initiated
-    ## 4            2004             Print           Other initiated
-    ## 5            2007             Print            Self initiated
-    ## 6            1921              <NA>                      <NA>
-    ##   Type.of.Outing.Who.discloses. Public.Sexual.Identity
-    ## 1                 Other's words            Unspecified
-    ## 2                     Own words                Lesbian
-    ## 3                 Other's words                    Gay
-    ## 4                 Other's words                    Gay
-    ## 5                     Own words                    Gay
-    ## 6                          <NA>            Unspecified
-    ##   Were.they.in..the.closet.. Public.Gender.Identity X2nd.Coming.Out..Nature
-    ## 1                    Unclear              Cis Woman                    <NA>
-    ## 2                    Unclear              Cis Woman               Amplified
-    ## 3                        Yes                Cis Man                    <NA>
-    ## 4                         No                Cis Man                    <NA>
-    ## 5                    Unclear                Cis Man                    <NA>
-    ## 6                       <NA>              Cis Woman               Amplified
-    ##   X2nd.Coming.Out..Sexual.ID
-    ## 1                       <NA>
-    ## 2                    Lesbian
-    ## 3                       <NA>
-    ## 4                       <NA>
-    ## 5                       <NA>
-    ## 6                    Lesbian
+    ## Rows: 176
+    ## Columns: 15
+    ## $ ID                            <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1…
+    ## $ First.Name                    <chr> "Jackie", "Ali", "James", "Roberto", "Cl…
+    ## $ Last.Name                     <chr> "Abbott", "Adler", "Adomian", "Aguirre S…
+    ## $ Race.Ethnicity                <chr> "White", "White", "White", "Latinx", "Wh…
+    ## $ Birth.Year                    <int> 1992, 1967, 1980, 1973, 1978, 1894, 1989…
+    ## $ Coming.Out.Age                <int> 30, 20, 30, 31, 29, 27, 29, NA, NA, 22, …
+    ## $ Coming.Out.Year               <int> 2017, 1987, 2010, 2004, 2007, 1921, 2018…
+    ## $ Coming.Out.Medium             <chr> "Social Media", "Print", "Online", "Prin…
+    ## $ Type.of.Outing.Initiation     <chr> "Other initiated", "Self initiated", "Ot…
+    ## $ Type.of.Outing.Who.discloses. <chr> "Other's words", "Own words", "Other's w…
+    ## $ Public.Sexual.Identity        <chr> "Unspecified", "Lesbian", "Gay", "Gay", …
+    ## $ Were.they.in..the.closet..    <chr> "Unclear", "Unclear", "Yes", "No", "Uncl…
+    ## $ Public.Gender.Identity        <chr> "Cis Woman", "Cis Woman", "Cis Man", "Ci…
+    ## $ X2nd.Coming.Out..Nature       <chr> NA, "Amplified", NA, NA, NA, "Amplified"…
+    ## $ X2nd.Coming.Out..Sexual.ID    <chr> NA, "Lesbian", NA, NA, NA, "Lesbian", "B…
 
 <br>
 
