@@ -83,13 +83,41 @@ data <- read.csv("HCP_data.csv", na.strings = c("","NA"))
 head(data)
 ```
 
-<div data-pagedtable="false">
-
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["ID"],"name":[1],"type":["int"],"align":["right"]},{"label":["First.Name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Last.Name"],"name":[3],"type":["chr"],"align":["left"]},{"label":["Race.Ethnicity"],"name":[4],"type":["chr"],"align":["left"]},{"label":["Birth.Year"],"name":[5],"type":["int"],"align":["right"]},{"label":["Coming.Out.Age"],"name":[6],"type":["int"],"align":["right"]},{"label":["Coming.Out.Year"],"name":[7],"type":["int"],"align":["right"]},{"label":["Coming.Out.Medium"],"name":[8],"type":["chr"],"align":["left"]},{"label":["Type.of.Outing.Initiation"],"name":[9],"type":["chr"],"align":["left"]},{"label":["Type.of.Outing.Who.discloses."],"name":[10],"type":["chr"],"align":["left"]},{"label":["Public.Sexual.Identity"],"name":[11],"type":["chr"],"align":["left"]},{"label":["Were.they.in..the.closet.."],"name":[12],"type":["chr"],"align":["left"]},{"label":["Public.Gender.Identity"],"name":[13],"type":["chr"],"align":["left"]},{"label":["X2nd.Coming.Out..Nature"],"name":[14],"type":["chr"],"align":["left"]},{"label":["X2nd.Coming.Out..Sexual.ID"],"name":[15],"type":["chr"],"align":["left"]}],"data":[{"1":"1","2":"Jackie","3":"Abbott","4":"White","5":"1992","6":"30","7":"2017","8":"Social Media","9":"Other initiated","10":"Other's words","11":"Unspecified","12":"Unclear","13":"Cis Woman","14":"NA","15":"NA","_rn_":"1"},{"1":"2","2":"Ali","3":"Adler","4":"White","5":"1967","6":"20","7":"1987","8":"Print","9":"Self initiated","10":"Own words","11":"Lesbian","12":"Unclear","13":"Cis Woman","14":"Amplified","15":"Lesbian","_rn_":"2"},{"1":"3","2":"James","3":"Adomian","4":"White","5":"1980","6":"30","7":"2010","8":"Online","9":"Other initiated","10":"Other's words","11":"Gay","12":"Yes","13":"Cis Man","14":"NA","15":"NA","_rn_":"3"},{"1":"4","2":"Roberto","3":"Aguirre Sacasa","4":"Latinx","5":"1973","6":"31","7":"2004","8":"Print","9":"Other initiated","10":"Other's words","11":"Gay","12":"No","13":"Cis Man","14":"NA","15":"NA","_rn_":"4"},{"1":"5","2":"Clay","3":"Aiken","4":"White","5":"1978","6":"29","7":"2007","8":"Print","9":"Self initiated","10":"Own words","11":"Gay","12":"Unclear","13":"Cis Man","14":"NA","15":"NA","_rn_":"5"},{"1":"6","2":"Loretta Mary","3":"Aiken","4":"Black","5":"1894","6":"27","7":"1921","8":"NA","9":"NA","10":"NA","11":"Unspecified","12":"NA","13":"Cis Woman","14":"Amplified","15":"Lesbian","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-
-</div>
+    ##   ID   First.Name      Last.Name Race.Ethnicity Birth.Year Coming.Out.Age
+    ## 1  1       Jackie         Abbott          White       1992             30
+    ## 2  2          Ali          Adler          White       1967             20
+    ## 3  3        James        Adomian          White       1980             30
+    ## 4  4      Roberto Aguirre Sacasa         Latinx       1973             31
+    ## 5  5        Clay           Aiken          White       1978             29
+    ## 6  6 Loretta Mary          Aiken          Black       1894             27
+    ##   Coming.Out.Year Coming.Out.Medium Type.of.Outing.Initiation
+    ## 1            2017      Social Media           Other initiated
+    ## 2            1987             Print            Self initiated
+    ## 3            2010            Online           Other initiated
+    ## 4            2004             Print           Other initiated
+    ## 5            2007             Print            Self initiated
+    ## 6            1921              <NA>                      <NA>
+    ##   Type.of.Outing.Who.discloses. Public.Sexual.Identity
+    ## 1                 Other's words            Unspecified
+    ## 2                     Own words                Lesbian
+    ## 3                 Other's words                    Gay
+    ## 4                 Other's words                    Gay
+    ## 5                     Own words                    Gay
+    ## 6                          <NA>            Unspecified
+    ##   Were.they.in..the.closet.. Public.Gender.Identity X2nd.Coming.Out..Nature
+    ## 1                    Unclear              Cis Woman                    <NA>
+    ## 2                    Unclear              Cis Woman               Amplified
+    ## 3                        Yes                Cis Man                    <NA>
+    ## 4                         No                Cis Man                    <NA>
+    ## 5                    Unclear                Cis Man                    <NA>
+    ## 6                       <NA>              Cis Woman               Amplified
+    ##   X2nd.Coming.Out..Sexual.ID
+    ## 1                       <NA>
+    ## 2                    Lesbian
+    ## 3                       <NA>
+    ## 4                       <NA>
+    ## 5                       <NA>
+    ## 6                    Lesbian
 
 <br>
 
