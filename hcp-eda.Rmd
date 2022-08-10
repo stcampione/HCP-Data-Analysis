@@ -1,14 +1,12 @@
 ---
 title: '**Hollywood Closet Project:** *Exploratory Data Analysis*'
 author: "Samuel Campione"
-output:
-  html_document:
+output: 
+  github_document:
     toc: yes
-    toc_float: yes
-    toc_depth: 3
+    toc_depth: 2
     df_print: paged
-    code_folding: hide
-    keep_md: yes
+always_allow_html: true
 ---
 
 <br>
@@ -41,14 +39,16 @@ output:
 ------------------------------------------------------------------------
 
 ```{r message=FALSE, warning=FALSE, class.source = "fold-show"}
+options(warn = -1) # Turn off warning messages
+
 # Load required libraries
-library(tidyverse)
-library(wesanderson)
-library(forcats)
-library(knitr)
-library(kableExtra)
-library(ggrepel)
-library(patchwork)
+suppressMessages(library(tidyverse))
+suppressMessages(library(wesanderson))
+suppressMessages(library(forcats))
+suppressMessages(library(knitr))
+suppressMessages(library(kableExtra))
+suppressMessages(library(ggrepel))
+suppressMessages(library(patchwork))
 ```
 
 <br>
@@ -131,7 +131,7 @@ data<- data %>%
 
 ### [3.1.1]{style="color: lightgrey;"} [Race]{style="color: steelblue;"}
 
-```{r echo=TRUE, warning=TRUE, fig.align='center'}
+```{r echo=FALSE, warning=TRUE, fig.align='center'}
 pct_format <- scales::percent_format(accuracy = .1) #Used in the future bar plots
 
 data %>%
@@ -158,7 +158,7 @@ data %>%
   scale_fill_manual(values = wes_palette("Moonrise3", 5, type = "continuous"))
 ```
 
-```{r, fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 data %>%
   filter(!is.na(race)) %>%
   group_by(race) %>%
@@ -166,7 +166,6 @@ data %>%
   summarise(Frequency = n()) %>%
   mutate("Relative Frequency" = round(Frequency / sum(Frequency), 3)) %>%
   kable(caption = "TABLE 1.1: Race",
-        format = "html",
         table.attr = "style='width:65%;'") %>%
   kable_classic() %>%
   kable_styling(bootstrap_options = c("striped"), font = 18) %>%
@@ -177,7 +176,7 @@ data %>%
 
 #### [Any missing values?]{style="color: grey;"}
 
-```{r}
+```{r echo=FALSE}
 # Create function to calculate return # of NAs in a variable
 NA_calc <- function(x) {
   a <- sum(is.na(x))
@@ -192,7 +191,7 @@ NA_calc(data$race)
 
 ### [3.1.2]{style="color: lightgrey;"} [Gender]{style="color: steelblue;"}
 
-```{r echo=TRUE, fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 data %>%
   filter(!is.na(gender)) %>%
   ggplot(aes(x = fct_infreq(gender), fill = fct_infreq(gender))) +
@@ -221,7 +220,7 @@ data %>%
   scale_fill_manual(values = wes_palette("Moonrise3", 10, type = "continuous"))
 ```
 
-```{r fig.align='center'}
+```{r fig.align='center', echo=FALSE}
 data %>%
   filter(!is.na(gender)) %>%
   group_by(gender) %>%
@@ -229,7 +228,6 @@ data %>%
   summarise(Frequency = n()) %>%
   mutate("Relative Frequency" = round(Frequency / sum(Frequency), 3)) %>%
   kable(caption = "TABLE 1.2: Gender",
-        format = "html",
         table.attr = "style='width:65%;'") %>%
   kable_classic() %>%
   kable_styling(bootstrap_options = c("striped"), font = 18) %>%
@@ -240,7 +238,7 @@ data %>%
 
 #### [Any missing values?]{style="color: grey;"}
 
-```{r fig.align='center'}
+```{r fig.align='center', echo=FALSE}
 NA_calc(data$gender)
 ```
 
@@ -250,7 +248,7 @@ NA_calc(data$gender)
 
 ### [3.1.3]{style="color: lightgrey;"} [Sexuality]{style="color: steelblue;"}
 
-```{r message=FALSE, warning=FALSE, fig.align='center'}
+```{r message=FALSE, warning=FALSE, fig.align='center', echo=FALSE}
 #The value "Unspecified non heterosexual" fits poorly, so I have revalued it to "Non heterosexual".
 data %>%
   filter(!is.na(sexuality)) %>%
@@ -281,7 +279,7 @@ data %>%
   scale_fill_manual(values = wes_palette("Moonrise3", 9, type = "continuous"))
 ```
 
-```{r fig.align='center'}
+```{r fig.align='center', echo=FALSE}
 data %>%
   filter(!is.na(sexuality)) %>%
   group_by(sexuality) %>%
@@ -290,7 +288,6 @@ data %>%
   summarise(Frequency = n()) %>%
   mutate("Relative Frequency" = round(Frequency / sum(Frequency), 3)) %>%
   kable(caption = "TABLE 1.3: Sexuality",
-        format = "html",
         table.attr = "style='width:60%;'") %>%
   kable_classic() %>%
   kable_styling(bootstrap_options = c("striped"), font = 18) %>%
@@ -301,7 +298,7 @@ data %>%
 
 #### [Any missing values?]{style="color: grey;"}
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 NA_calc(data$sexuality)
 ```
 
@@ -311,7 +308,7 @@ NA_calc(data$sexuality)
 
 ### [3.1.2]{style="color: lightgrey;"} [In the closet?]{style="color: steelblue;"}
 
-```{r message=FALSE, warning=FALSE, fig.align='center'}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 data %>%
   filter(!is.na(closeted)) %>%
   ggplot(aes(x = closeted, fill = closeted)) +
@@ -336,7 +333,7 @@ data %>%
   scale_fill_manual(values = c("#85D4E3","LightBlue", "Linen", "#F4B5BD", "MistyRose"))
 ```
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 data %>%
   filter(!is.na(closeted)) %>%
   group_by(closeted) %>%
@@ -344,7 +341,6 @@ data %>%
   summarise(Frequency = n()) %>%
   mutate("Relative Frequency" = round(Frequency/sum(Frequency), 3)) %>%
   kable(caption = "TABLE 1.4: Closeted before coming out", 
-        format = "html", 
         table.attr = "style='width:65%;'") %>% 
   kable_classic() %>%
   kable_styling(bootstrap_options = c("striped"), font = 18) %>%
@@ -355,7 +351,7 @@ data %>%
 
 #### [Any missing values?]{style="color: grey;"}
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 NA_calc(data$closeted)
 ```
 
@@ -365,7 +361,7 @@ NA_calc(data$closeted)
 
 ### [3.1.5]{style="color: lightgrey;"} [Coming Out Medium]{style="color: steelblue;"}
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 data %>%
   filter(!is.na(medium)) %>%
   ggplot(aes(x = fct_infreq(medium), fill = fct_infreq(medium))) +
@@ -390,7 +386,7 @@ data %>%
   scale_fill_manual(values = wes_palette("Moonrise3", 6, type = "continuous"))
 ```
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 data %>%
   group_by(medium) %>%
   filter(!is.na(medium)) %>%
@@ -398,7 +394,6 @@ data %>%
   summarise(Frequency = n()) %>%
   mutate("Relative Frequency" = round(Frequency/sum(Frequency), 3)) %>%
   kable(caption = "TABLE 1.5: Medium of coming out",
-        format = "html", 
         table.attr = "style='width:65%;'") %>% 
   kable_classic() %>%
   kable_styling(bootstrap_options = c("striped"), font = 18) %>%
@@ -409,7 +404,7 @@ data %>%
 
 #### [Any missing values?]{style="color: grey;"}
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 NA_calc(data$medium)
 ```
 
@@ -419,7 +414,7 @@ NA_calc(data$medium)
 
 ### [3.1.6]{style="color: lightgrey;"} [Who Initiated Coming Out?]{style="color: steelblue;"}
 
-```{r fig.width= 4, fig.align='center'}
+```{r echo=FALSE, fig.width= 4, fig.align='center'}
 data %>%
   filter(!is.na(initiation)) %>%
   ggplot(aes(x = fct_infreq(initiation), fill = fct_infreq(initiation))) +
@@ -444,7 +439,7 @@ data %>%
   scale_fill_manual(values = wes_palette("Moonrise3", 2, type = "continuous"))
 ```
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 data %>%
   group_by(initiation) %>%
   filter(!is.na(initiation)) %>%
@@ -452,7 +447,7 @@ data %>%
   summarise(Frequency = n()) %>%
   mutate("Relative Frequency" = round(Frequency/sum(Frequency), 3)) %>%
   kable(caption = "TABLE 1.6: Who initiated coming out",
-        format = "html", table.attr = "style='width:65%;'") %>% 
+        table.attr = "style='width:65%;'") %>% 
   kable_classic() %>%
   kable_styling(bootstrap_options = c("striped"), font = 18) %>%
   row_spec(0,bold=TRUE)
@@ -462,7 +457,7 @@ data %>%
 
 #### [Any missing values?]{style="color: grey;"}
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 NA_calc(data$initiation)
 ```
 
@@ -472,7 +467,7 @@ NA_calc(data$initiation)
 
 ### [3.1.7]{style="color: lightgrey;"} [Who Disclosed?]{style="color: steelblue;"}
 
-```{r fig.width= 4, fig.align='center'}
+```{r echo=FALSE, fig.width= 4, fig.align='center'}
 data %>%
   filter(!is.na(disclosure)) %>%
   ggplot(aes(x = fct_infreq(disclosure), fill = fct_infreq(disclosure))) +
@@ -497,14 +492,14 @@ data %>%
   scale_fill_manual(values = wes_palette("Moonrise3", 2, type = "continuous"))
 ```
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 data %>%
   group_by(disclosure) %>%
   filter(!is.na(disclosure)) %>%
   rename(Disclosure = disclosure) %>%
   summarise(Frequency = n()) %>%
   mutate("Relative Frequency" = round(Frequency/sum(Frequency), 3)) %>%
-  kable(caption = "TABLE 1.7: Who disclosed", format = "html", table.attr = "style='width:65%;'") %>% 
+  kable(caption = "TABLE 1.7: Who disclosed",  table.attr = "style='width:65%;'") %>% 
   kable_classic() %>%
   kable_styling(bootstrap_options = c("striped"), font = 18) %>%
   row_spec(0,bold=TRUE)
@@ -514,7 +509,7 @@ data %>%
 
 #### [Any missing values?]{style="color: grey;"}
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 NA_calc(data$disclosure)
 ```
 
@@ -524,7 +519,7 @@ NA_calc(data$disclosure)
 
 ### [3.1.8]{style="color: lightgrey;"} [Had Second Coming Out?]{style="color: steelblue;"}
 
-```{r fig.width= 4, fig.align='center'}
+```{r echo=FALSE, fig.width= 4, fig.align='center'}
 data %>%
   filter(!is.na(coming_out_2)) %>%
   mutate(coming_out_2 = as.factor(coming_out_2)) %>%
@@ -551,7 +546,7 @@ data %>%
   scale_fill_manual(values = wes_palette("Moonrise3", 2, type = "continuous"))
 ```
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 data %>%
   group_by(coming_out_2) %>%
   filter(!is.na(coming_out_2)) %>%
@@ -560,7 +555,7 @@ data %>%
   rename("Had 2nd Coming Out" = coming_out_2) %>%
   summarise(Frequency = n()) %>%
   mutate("Relative Frequency" = round(Frequency/sum(Frequency), 2)) %>%
-  kable(caption = "TABLE 1.8: Second coming out events", format = "html", table.attr = "style='width:65%;'") %>%
+  kable(caption = "TABLE 1.8: Second coming out events", table.attr = "style='width:65%;'") %>%
   kable_classic() %>%
   kable_styling(bootstrap_options = c("striped"), font = 18) %>%
   row_spec(0,bold=TRUE)
@@ -570,7 +565,7 @@ data %>%
 
 #### [Any missing values?]{style="color: grey;"}
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 NA_calc(data$coming_out_2)
 ```
 
@@ -580,7 +575,7 @@ NA_calc(data$coming_out_2)
 
 ### [3.1.9]{style="color: lightgrey;"} [Second Coming Out Nature]{style="color: steelblue;"}
 
-```{r fig.width= 4, fig.align='center'}
+```{r echo=FALSE, fig.width= 4, fig.align='center'}
 data %>%
   filter(coming_out_2 == 1, 
          !is.na(coming_out_nature_2)) %>%
@@ -606,7 +601,7 @@ data %>%
   scale_fill_manual(values = wes_palette("Moonrise3", 2, type = "continuous"))
 ```
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 data %>%
   group_by(coming_out_nature_2) %>%
   filter(coming_out_2 == 1,
@@ -614,7 +609,7 @@ data %>%
   rename("Nature" = coming_out_nature_2) %>%
   summarise(Frequency = n()) %>%
   mutate("Relative Frequency" = round(Frequency/sum(Frequency), 2)) %>%
-  kable(caption = "TABLE 1.9: Nature of second coming out", format = "html", table.attr = "style='width:65%;'") %>%
+  kable(caption = "TABLE 1.9: Nature of second coming out", table.attr = "style='width:65%;'") %>%
   kable_classic() %>%
   kable_styling(bootstrap_options = c("striped"), font = 18) %>%
   row_spec(0,bold=TRUE)
@@ -624,7 +619,7 @@ data %>%
 
 #### [Any missing values?]{style="color: grey;"}
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 subset <- data %>%
   filter(coming_out_2 == 1)
 NA_calc(subset$coming_out_nature_2)
@@ -636,7 +631,7 @@ NA_calc(subset$coming_out_nature_2)
 
 ### [3.1.10]{style="color: lightgrey;"} [Second Coming Out Sexuality]{style="color: steelblue;"}
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 data %>%
   filter(coming_out_2 == 1, 
          !is.na(sexuality_2)) %>%
@@ -663,7 +658,7 @@ data %>%
   scale_fill_manual(values = wes_palette("Moonrise3", 10, type = "continuous"))
 ```
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 data %>%
   mutate(sexuality_2 = fct_recode(sexuality_2, "Non heterosexual"= "Unspecified non heterosexual",
                                   "Unspecified" = "Unspecified ")) %>%
@@ -673,7 +668,7 @@ data %>%
   rename("Sexuality" = sexuality_2) %>%
   summarise(Frequency = n()) %>%
   mutate("Relative Frequency" = round(Frequency/sum(Frequency), 2)) %>%
-  kable(caption = "TABLE 1.10: Sexuality at second coming out", format = "html", table.attr = "style='width:75%;'") %>%
+  kable(caption = "TABLE 1.10: Sexuality at second coming out", table.attr = "style='width:75%;'") %>%
   kable_classic() %>%
   kable_styling(bootstrap_options = c("striped"), font = 18) %>%
   row_spec(0,bold=TRUE)
@@ -683,7 +678,7 @@ data %>%
 
 #### [Any missing values?]{style="color: grey;"}
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 NA_calc(subset$sexuality_2)
 ```
 
@@ -695,7 +690,7 @@ NA_calc(subset$sexuality_2)
 
 #### Current ages in 2022 based on birth year. For simplicity, I applied a filter to include only those under 100 years old
 
-```{r echo=TRUE, message=FALSE, warning=FALSE, fig.align='center'}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 p1 <- data %>%
   filter(!is.na(birth_year)) %>%
   mutate(current_age = 2022 - birth_year) %>%
@@ -748,8 +743,8 @@ p2 <- data %>%
 
 p1 + p2
 ```
-
-```{r echo=TRUE, message=FALSE, warning=FALSE, fig.height= 3, fig.align='center'}
+<br>
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.height= 2.5, fig.align='center'}
 is.outlier <- function(x) {
   return(x  < quantile(x, 0.25) - 1.5 * IQR(x) |
            x > quantile(x, 0.75) + 1.5 * IQR(x))
@@ -777,8 +772,8 @@ data %>%
   geom_text_repel(aes(label = ifelse(duplicated(Outlier), "", Outlier))) +
   annotate("text", x = 41 + 5, y = 1.5, label = paste("median = 41"), fontface = 2)
 ```
-
-```{r, fig.align='center'}
+<br>
+```{r echo=FALSE, fig.align='center'}
 data %>%
   filter(!is.na(birth_year)) %>%
   mutate(current_age = 2022 - birth_year) %>%
@@ -789,7 +784,7 @@ data %>%
             Max = max(current_age),
             NAs = sum(is.na(age))
             ) %>%
-  kable(caption = "TABLE 1.11: Summary of Current Ages", format = "html", table.attr = "style='width:40%;'") %>% 
+  kable(caption = "TABLE 1.11: Summary of Current Ages", table.attr = "style='width:40%;'") %>% 
   kable_classic() %>%
   kable_styling(bootstrap_options = c("striped"), font = 20) %>%
   row_spec(0,bold=TRUE)
@@ -801,7 +796,7 @@ data %>%
 
 ### [3.1.12]{style="color: lightgrey;"} [Coming Out Year]{style="color: steelblue;"}
 
-```{r echo=TRUE, message=FALSE, warning=FALSE, fig.align='center'}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 p1 <- data %>%
   filter(!is.na(coming_out_year), 
          coming_out_year > 1940) %>%
@@ -850,8 +845,9 @@ p2 <- data %>%
 
 p1 + p2
 ```
+<br>
 
-```{r echo=TRUE, message=FALSE, warning=FALSE, fig.height= 3, fig.align='center'}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.height= 2.5, fig.align='center'}
 is.outlier <- function(x) {
   return(x  < quantile(x, 0.25) - 1.5 * IQR(x) |
            x > quantile(x, 0.75) + 1.5 * IQR(x))
@@ -878,8 +874,8 @@ data %>%
   geom_text_repel(aes(label = ifelse(duplicated(Outlier), "", Outlier))) +
   annotate("text", x = median(data$coming_out_year, na.rm = T) -2, y = 1.5, label = paste("median = ", median(data$coming_out_year, na.rm = T)), fontface = 2)
 ```
-
-```{r fig.align='center'}
+<br>
+```{r echo=FALSE, fig.align='center'}
 data %>%
   filter(!is.na(coming_out_year)) %>%
   summarise(Mean =  round(mean(coming_out_year)),
@@ -889,7 +885,7 @@ data %>%
             Max = max(coming_out_year),
             NAs = sum(is.na(age))
             ) %>%
-  kable(caption = "TABLE 1.12: Summary of Coming Out Years", format = "html", table.attr = "style='width:40%;'") %>% 
+  kable(caption = "TABLE 1.12: Summary of Coming Out Years", table.attr = "style='width:45%;'") %>% 
   kable_classic() %>%
   kable_styling(bootstrap_options = c("striped"), font = 20) %>%
   row_spec(0,bold=TRUE)
@@ -901,7 +897,7 @@ data %>%
 
 ### [3.1.13]{style="color: lightgrey;"} [Age at Coming Out]{style="color: steelblue;"}
 
-```{r echo=TRUE, message=FALSE, warning=FALSE, fig.align='center'}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 p1 <- data %>% 
   filter(!is.na(age)) %>%
   ggplot(aes(x = age)) +
@@ -947,8 +943,9 @@ p2 <- data %>%
 
 p1 + p2
 ```
+<br>
 
-```{r echo=TRUE, message=FALSE, warning=FALSE, fig.height= 3, fig.align='center'}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.height= 2.5, fig.align='center'}
 is.outlier <- function(x) {
   return(x  < quantile(x, 0.25) - 1.5 * IQR(x) |
            x > quantile(x, 0.75) + 1.5 * IQR(x))
@@ -976,7 +973,7 @@ data %>%
   annotate("text", x = median(data$age, na.rm = T) + 10, y = 1.5, label = paste("median = ", median(data$age, na.rm = T)), fontface = 2)
 ```
 
-```{r fig.align='center'}
+```{r echo=FALSE, fig.align='center'}
 data %>%
   filter(!is.na(age)) %>%
   summarise(Mean =  round(mean(age),1),
@@ -986,7 +983,7 @@ data %>%
             Max = max(age),
             NAs = sum(is.na(age))
             ) %>%
-  kable(caption = "TABLE 1.13: Summary of Coming Out Age", format = "html", table.attr = "style='width:40%;'") %>% 
+  kable(caption = "TABLE 1.13: Summary of Coming Out Age", table.attr = "style='width:40%;'") %>% 
   kable_classic() %>%
   kable_styling(bootstrap_options = c("striped"), font = 20) %>%
   row_spec(0,bold=TRUE)
@@ -1006,7 +1003,7 @@ data %>%
 
 #### [Are younger generations coming out at a younger age?]{style="color: grey;"}
 
-```{r message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 data %>%
   mutate(decade = cut(birth_year, breaks = c(0, 1946, 1965, 1977, 1995, Inf),
     labels = c("Pre-Boomer", "Boomer", "Gen X", "Millenial", "Gen Z")), include.lowest = TRUE, exclude=NULL) %>%
@@ -1014,7 +1011,7 @@ data %>%
   filter(!is.na(age)) %>%
   ggplot(aes(x = birth_year, y = age, color = decade)) +
   geom_point(aes(color = decade, alpha = 0.5)) +
-  geom_smooth(method=lm, se=FALSE) + 
+  geom_smooth(formula = y ~ x, method=lm, se=FALSE) + 
   labs(title = "Figure 2.1a",
        subtitle = "Coming Out Age and Generation",
        x = "Year",
@@ -1029,7 +1026,7 @@ data %>%
   scale_color_manual(values =wes_palette("Moonrise3", 5))
 ```
 
-```{r message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 data %>%
   mutate(decade = cut(birth_year, breaks = c(0, 1946, 1965, 1977, 1995, Inf),
     labels = c("Pre-Boomer", "Boomer", "Gen X", "Millenial", "Gen Z")), include.lowest = TRUE, exclude=NULL) %>%
@@ -1049,12 +1046,12 @@ data %>%
                                   face = "bold")) +
   scale_fill_manual(values =wes_palette("Moonrise3", 5)) +
   theme(axis.text.x = element_text(size=12)) +
-  geom_smooth(method = "lm", se=TRUE, aes(group=1), color = "dimgray", linetype="dashed", size = .5)
+  geom_smooth(formula = y ~ x, method = "lm", se=TRUE, aes(group=1), color = "dimgray", linetype="dashed", size = .5)
 ```
 
 <br>
 
-```{r message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 data %>% 
   mutate(decade = cut(birth_year, breaks = c(0, 1946, 1965, 1977, 1995, Inf),
     labels = c("Pre-Boomer", "Boomer", "Gen X", "Millenial", "Gen Z")), include.lowest = TRUE, exclude=NULL) %>%
@@ -1062,7 +1059,7 @@ data %>%
   filter(!is.na(age)) %>%
   summarize(count = n(),
             mean = round(mean(age), 2)) %>%
-  kable(caption = "TABLE 2.1: Birth Decade and Coming Out Age", format = "html", table.attr = "style='width:50%;'", col.names = c("Decade","Count","Mean Coming Out Age")) %>% 
+  kable(caption = "TABLE 2.1: Birth Decade and Coming Out Age", table.attr = "style='width:50%;'", col.names = c("Decade","Count","Mean Coming Out Age")) %>% 
   kable_classic() %>%
   kable_styling(bootstrap_options = c("striped"), font = 20) %>%
   row_spec(0,bold=TRUE) 
@@ -1076,7 +1073,7 @@ data %>%
 
 #### [What does coming out age look across race?]{style="color: grey;"}
 
-```{r message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 data %>%
   group_by(race) %>%
   filter(race != "Unknown") %>%
@@ -1099,7 +1096,7 @@ data %>%
 
 <br>
 
-```{r message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 data %>%
   filter(!is.na(age)) %>%
   group_by(race) %>%
@@ -1108,7 +1105,7 @@ data %>%
             round(median(age),2),
             round(min(age),2),
             round(max(age),2)) %>%
-  kable(caption = "TABLE 2.2: Race and Coming Out Age", format = "html", table.attr = "style='width:50%;'", col.names = c("Race","Count","Mean", "Median", "Min", "Max")) %>% 
+  kable(caption = "TABLE 2.2: Race and Coming Out Age", table.attr = "style='width:50%;'", col.names = c("Race","Count","Mean", "Median", "Min", "Max")) %>% 
   kable_classic() %>%
   kable_styling(bootstrap_options = c("striped"), font = 20) %>%
   row_spec(0,bold=TRUE) 
@@ -1122,7 +1119,7 @@ data %>%
 
 #### [What does coming out age look across gender?]{style="color: grey;"}
 
-```{r message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 data %>%
   group_by(gender) %>%
   filter(!is.na(gender)) %>%
@@ -1147,7 +1144,7 @@ data %>%
 
 <br>
 
-```{r message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 data %>%
   filter(!is.na(age),
          !is.na(gender)) %>%
@@ -1159,7 +1156,7 @@ data %>%
             round(median(age),2),
             round(min(age),2),
             round(max(age),2)) %>%
-  kable(caption = "TABLE 2.3: Gender and Coming Out Age", format = "html", table.attr = "style='width:60%;'", col.names = c("Gender","Count","Mean", "Median", "Min", "Max")) %>% 
+  kable(caption = "TABLE 2.3: Gender and Coming Out Age", table.attr = "style='width:60%;'", col.names = c("Gender","Count","Mean", "Median", "Min", "Max")) %>% 
   kable_classic() %>%
   kable_styling(bootstrap_options = c("striped"), font = 20) %>%
   row_spec(0,bold=TRUE) 
@@ -1175,7 +1172,7 @@ data %>%
 
 <br>
 
-```{r message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 data %>%
   group_by(sexuality) %>%
   filter(!is.na(sexuality),
@@ -1200,7 +1197,7 @@ data %>%
                                   face = "bold"))
 ```
 
-```{r message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 data %>%
   filter(!is.na(age),
          !is.na(sexuality)) %>%
@@ -1212,7 +1209,7 @@ data %>%
             round(median(age),2),
             round(min(age),2),
             round(max(age),2)) %>%
-  kable(caption = "TABLE 2.4: Sexuality and Coming Out Age", format = "html", table.attr = "style='width:60%;'", col.names = c("Sexuality","Count","Mean", "Median", "Min", "Max")) %>% 
+  kable(caption = "TABLE 2.4: Sexuality and Coming Out Age", table.attr = "style='width:60%;'", col.names = c("Sexuality","Count","Mean", "Median", "Min", "Max")) %>% 
   kable_classic() %>%
   kable_styling(bootstrap_options = c("striped"), font = 20) %>%
   row_spec(0,bold=TRUE) 
